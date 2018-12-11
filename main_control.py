@@ -16,31 +16,20 @@ import data_mining.chi_square as chi_square
 import data_mining.naive_bayes as naive_bayes
 
 
-def copy_dir():
-    if os.path.exists('/home/alery/process/test_corpus_seg_chi'):
-        return
-    os.system('cp -r /home/alery/process/test_corpus_seg /home/alery/process/test_corpus_seg_chi')
-    os.system('cp -r /home/alery/process/train_corpus_seg /home/alery/process/train_corpus_seg_chi')
+
 
 
 def process_with_chi_square():
     corpus_segment.main()
-
-    # 将分词结果复制一份用作卡方检验 特征提取
-    copy_dir()
-
     chi_square.main()
-    save_to_bunch.main(True)
+    save_to_bunch.main()
     word_vector_space.main()
     naive_bayes.main()
 
 
 def chi_square_after_corpus_seg():
-    # 将分词结果复制一份用作卡方检验 特征提取
-    copy_dir()
-
     chi_square.main()
-    save_to_bunch.main(True)
+    save_to_bunch.main()
     word_vector_space.main()
     naive_bayes.main()
 

@@ -8,18 +8,21 @@
 """
 
 import os
+import time
+
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
+from data_mining.config import *
 
 cate = []
 
 
-def read_corpus(train_path):
-    dirs = os.listdir(train_path)
+def read_corpus(path):
+    dirs = os.listdir(path)
     res = []
     for my_dir in dirs:
         cate.append(my_dir)
-        dir_path = os.path.join(train_path, my_dir)
+        dir_path = os.path.join(path, my_dir)
         files = os.listdir(dir_path)
         temp = []
         for file in files:
@@ -41,9 +44,8 @@ def write_file(path, content):
 
 
 def main():
-    base_path = '/home/alery/process/'
-    train_path = base_path + 'train_corpus_seg/'
-    test_path = base_path + 'test_corpus_seg/'
+    start_time = time.time()
+
     corpus = read_corpus(train_path)
 
     # 该类会将文本中的词语转换为词频矩阵，矩阵元素a[i][j] 表示j词在i类文本下的词频
@@ -72,7 +74,10 @@ def main():
                 # print(word[j], weight[i][j])
         d_list = sorted(d.items(), key=lambda d1: d1[1], reverse=True)
         # print(d_list)
-        write_file(base_path + 'train_word_bag/tf_idf/{}.txt'.format(cate[i]), d_list)
+        write_file(base_path + '{0}{1}.txt'.format(save_tfidf_path, cate[i]), d_list)
+
+    end_time = time.time()
+    print('tf_idf耗时：{}秒'.format(int(end_time - start_time)))
 
 
 if __name__ == '__main__':

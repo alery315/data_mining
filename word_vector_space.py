@@ -7,8 +7,11 @@
 @time: 18-11-26 下午3:17
 """
 import _pickle as pickle
+import time
+
 from sklearn.datasets.base import Bunch
 from sklearn.feature_extraction.text import TfidfVectorizer
+from data_mining.config import *
 
 
 def read_file(file):
@@ -37,7 +40,7 @@ def tf_idf(stop_word_file, bunch_path, space_path, train_tfidf_path=None):
                         contents=bunch.contents,
                         tdm=[],
                         vocabulary=[],
-                        vec=[])
+                        vec=None)
 
     '''
     sublinear_tf 计算tf采用亚线性策略,以前是词频,现在用1+log(tf)来当词频
@@ -49,11 +52,11 @@ def tf_idf(stop_word_file, bunch_path, space_path, train_tfidf_path=None):
         tfidf_space.vocabulary = trainbunch.vocabulary
         vectorizer = TfidfVectorizer(stop_words=stop_word_list, sublinear_tf=True, max_df=0.35, min_df=0.001,
                                      vocabulary=trainbunch.vocabulary)
-        tfidf_space.vec = [vectorizer]
+        tfidf_space.vec = vectorizer
         tfidf_space.tdm = vectorizer.fit_transform(bunch.contents)
     else:
         vectorizer = TfidfVectorizer(stop_words=stop_word_list, sublinear_tf=True, max_df=0.35, min_df=0.001)
-        tfidf_space.vec = [vectorizer]
+        tfidf_space.vec = vectorizer
         tfidf_space.tdm = vectorizer.fit_transform(bunch.contents)
         tfidf_space.vocabulary = vectorizer.vocabulary_
 
@@ -62,16 +65,13 @@ def tf_idf(stop_word_file, bunch_path, space_path, train_tfidf_path=None):
 
 
 def main():
-    base_path = '/home/alery/process/'
-    stop_word = 'stopwords.txt'
-    bunch_path = base_path + 'train_word_bag/train_set.dat'
-    space_path = base_path + 'train_word_bag/tfidf_space.dat'
-    tf_idf(stop_word, bunch_path, space_path)
+    start_time = time.time()
 
-    bunch_path = base_path + "test_word_bag/test_set.dat"
-    space_path = base_path + "test_word_bag/test_space.dat"
-    train_tfidf_path = base_path + "train_word_bag/tfidf_space.dat"
-    tf_idf(stop_word, bunch_path, space_path, train_tfidf_path)
+    tf_idf(stop_word_path, train_bunch_path, train_space_path)
+    tf_idf(stop_word_path, test_bunch_path, test_space_path, train_space_path)
+
+    end_time = time.time()
+    print('分词耗时：{}秒'.format(int(end_time - start_time)))
 
 
 if __name__ == '__main__':

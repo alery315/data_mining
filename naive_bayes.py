@@ -7,8 +7,11 @@
 @time: 18-11-26 下午4:16
 """
 import _pickle as pickle
+import time
+
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import metrics
+from data_mining.config import *
 
 
 def read_bunch_obj(file):
@@ -25,14 +28,13 @@ def metrics_result(actual, predict):
 
 
 def main():
-    base_path = '/home/alery/process/'
+    start_time = time.time()
+
     # 导入训练集
-    train_path = base_path + "train_word_bag/tfidf_space.dat"
-    train_set = read_bunch_obj(train_path)
+    train_set = read_bunch_obj(train_space_path)
 
     # 导入测试集
-    test_path = base_path + "test_word_bag/test_space.dat"
-    test_set = read_bunch_obj(test_path)
+    test_set = read_bunch_obj(test_space_path)
 
     print('train词向量矩阵shape: ', train_set.tdm.shape)
     print('test词向量矩阵shape: ', test_set.tdm.shape)
@@ -73,6 +75,9 @@ def main():
     for k, v in error_num.items():
         print(k, v, sum([num for num in v.values()]))
     metrics_result(test_set.label, predicted)
+
+    end_time = time.time()
+    print('分词耗时：{}秒'.format(int(end_time - start_time)))
 
 
 if __name__ == '__main__':

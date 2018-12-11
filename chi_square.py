@@ -7,9 +7,12 @@
 @time: 18-11-30 下午4:20
 """
 import os
+import time
+
+from data_mining.config import *
 
 sum_dict = {}
-RESERVED_NUM = 12000
+RESERVED_NUM = 10000
 
 
 def write_file(path, content):
@@ -127,17 +130,17 @@ def process_corpus_file(path):
 
 
 def main():
+    start_time = time.time()
 
-    # os.system('rm -rf /home/alery/process/test_corpus_seg_chi')
-    # os.system('rm -rf /home/alery/process/train_corpus_seg_chi')
-    # os.system('cp -r /home/alery/process/test_corpus_seg /home/alery/process/test_corpus_seg_chi')
-    # os.system('cp -r /home/alery/process/train_corpus_seg /home/alery/process/train_corpus_seg_chi')
+    os.system('rm -rf /home/alery/process/test_corpus_seg_chi')
+    os.system('rm -rf /home/alery/process/train_corpus_seg_chi')
+    os.system('cp -r /home/alery/process/test_corpus_seg /home/alery/process/test_corpus_seg_chi')
+    os.system('cp -r /home/alery/process/train_corpus_seg /home/alery/process/train_corpus_seg_chi')
 
-    # os.system('rm -rf /home/alery/process/chi_square/*')
+    os.system('rm -rf /home/alery/process/chi_square/*')
 
-    base_path = '/home/alery/process/'
-    test_corpus_path = base_path + 'train_corpus_seg_chi/'
-    chi_path = base_path + 'chi_square/'
+    print('文件处理完成!')
+
     if not os.path.exists(chi_path):
         os.mkdir(chi_path)
 
@@ -151,11 +154,11 @@ def main():
     calc_chi_square()
 
     # 处理原有分词文件
-    corpus_path = base_path + "train_corpus_seg_chi/"
-    process_corpus_file(corpus_path)
+    process_corpus_file(train_corpus_chi_path)
+    process_corpus_file(test_corpus_chi_path)
 
-    corpus_path = base_path + "test_corpus_seg_chi/"
-    process_corpus_file(corpus_path)
+    end_time = time.time()
+    print('卡方计算与特征提取耗时：{}秒'.format(int(end_time - start_time)))
 
 
 if __name__ == '__main__':

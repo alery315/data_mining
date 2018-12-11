@@ -8,8 +8,9 @@
 """
 import os
 import _pickle as pickle
+import time
 from multiprocessing.pool import Pool
-
+from data_mining.config import *
 import threadpool
 from sklearn.datasets.base import Bunch
 
@@ -61,21 +62,13 @@ def corpus_to_bunch(word_bag_path, seg_path):
     print('构建文本对象结束')
 
 
-def main(flag=False):
-    path = '/home/alery/process/'
+def main():
+    start_time = time.time()
+    corpus_to_bunch(train_word_bag_path, train_seg_path)
 
-    word_bag_path = path + "train_word_bag/train_set.dat"
-
-    seg_path = path + 'train_corpus_seg/'
-    if flag:
-        seg_path = path + 'train_corpus_seg_chi/'
-    corpus_to_bunch(word_bag_path, seg_path)
-
-    word_bag_path = path + "test_word_bag/test_set.dat"
-    seg_path = path + 'test_corpus_seg/'
-    if flag:
-        seg_path = path + 'test_corpus_seg_chi/'
-    corpus_to_bunch(word_bag_path, seg_path)
+    corpus_to_bunch(test_word_bag_path, test_seg_path)
+    end_time = time.time()
+    print('保存到bunch耗时：{}秒'.format(int(end_time - start_time)))
 
 
 if __name__ == '__main__':
