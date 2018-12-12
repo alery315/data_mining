@@ -3,7 +3,7 @@
 
 """
 @author: alery
-@file: split.py
+@file: split_sohu_data.py
 @time: 2018/11/11 21:37
 """
 
@@ -60,15 +60,6 @@ def process_content(path):
                 # print(e.__str__())
         # print(len(arr))
 
-    # items = collections.Counter(cates)
-    #
-    # for k, v in items.items():
-    #     if v < 10:  # 反正这个数也比较小
-    #         for i in range(v):
-    #             cates.remove(k)
-    # print(items)
-    # return set(cates)
-
 
 def save_to_mongo(data):
     try:
@@ -96,20 +87,6 @@ def main():
         pool.map(process_content, [d + '/' + file for file in files])
         pool.close()
         pool.join()
-        # for file in files:
-        #     file = d + '/' + file
-        #     process_content(file)
-        # for i in range(30):
-        #     file = d + '/' + files[i]
-        #
-        #     s = s | process_content(file)
-
-    # print(s)
-
-
-class Main:
-    def __init__(self):
-        pass
 
 
 if __name__ == '__main__':

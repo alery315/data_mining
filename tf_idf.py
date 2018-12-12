@@ -46,7 +46,7 @@ def write_file(path, content):
 def main():
     start_time = time.time()
 
-    corpus = read_corpus(train_path)
+    corpus = read_corpus(train_corpus_seg_path)
 
     # 该类会将文本中的词语转换为词频矩阵，矩阵元素a[i][j] 表示j词在i类文本下的词频
     vectorizer = CountVectorizer()

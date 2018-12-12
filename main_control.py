@@ -16,9 +16,6 @@ import data_mining.chi_square as chi_square
 import data_mining.naive_bayes as naive_bayes
 
 
-
-
-
 def process_with_chi_square():
     corpus_segment.main()
     chi_square.main()

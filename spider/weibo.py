@@ -5,6 +5,7 @@
 @author: alery
 @file: sohu
 @time: 18-11-12 下午4:33
+@desc: 爬取热门微博分类,数量不多
 """
 import time
 import pymongo
@@ -12,7 +13,7 @@ from selenium import webdriver
 from pyquery import PyQuery as pq
 
 MONGO_URL = 'mongodb://127.0.0.1:27017'
-MONGO_DB = 'sina_1'
+MONGO_DB = 'sina_weibo'
 MONGO_COLLECTION = 'none'
 
 client = pymongo.MongoClient(MONGO_URL, connect=False)
@@ -95,18 +96,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# def parse_response_toutiao(resp):
-#     doc = pq(resp)
-#     items = doc('.news-list .news-wrapper .news-box').items()
-#     for item in items:
-#         # print(item.html())
-#         try:
-#             a = re.search('<h4.*?>(.*?)</h4>', item.html(), re.S).group(1).replace('\n', '')
-#             a = pq(a)
-#             url = a.attr('href')
-#             if url[0] == '/':
-#                 url = 'http:' + a.attr('href')
-#                 print(url)
-#         except BaseException as e:
-#             print(e.__str__())

@@ -37,12 +37,12 @@ def read_chi_square(path):
         return d
 
 
-def calc_word_times(path, chi_path):
+def calc_word_times(path, chi_path_):
     dirs = os.listdir(path)
     for my_dir in dirs:
         dir_path = os.path.join(path, my_dir)
         files = os.listdir(dir_path)
-        chi_file_path = os.path.join(chi_path, my_dir) + '.txt'
+        chi_file_path = os.path.join(chi_path_, my_dir) + '.txt'
         d = {}
         for file in files:
             file_path = os.path.join(dir_path, file)
@@ -132,12 +132,12 @@ def process_corpus_file(path):
 def main():
     start_time = time.time()
 
-    os.system('rm -rf /home/alery/process/test_corpus_seg_chi')
-    os.system('rm -rf /home/alery/process/train_corpus_seg_chi')
-    os.system('cp -r /home/alery/process/test_corpus_seg /home/alery/process/test_corpus_seg_chi')
-    os.system('cp -r /home/alery/process/train_corpus_seg /home/alery/process/train_corpus_seg_chi')
-
-    os.system('rm -rf /home/alery/process/chi_square/*')
+    # os.system('rm -rf /home/alery/process/test_corpus_seg_chi')
+    # os.system('rm -rf /home/alery/process/train_corpus_seg_chi')
+    # os.system('cp -r /home/alery/process/test_corpus_seg /home/alery/process/test_corpus_seg_chi')
+    # os.system('cp -r /home/alery/process/train_corpus_seg /home/alery/process/train_corpus_seg_chi')
+    #
+    # os.system('rm -rf /home/alery/process/chi_square/*')
 
     print('文件处理完成!')
 
@@ -145,7 +145,7 @@ def main():
         os.mkdir(chi_path)
 
     # 计算词频并写入文件
-    calc_word_times(test_corpus_path, chi_path)
+    calc_word_times(train_corpus_seg_path, chi_path)
 
     # 读入词频
     read_word_times(chi_path)

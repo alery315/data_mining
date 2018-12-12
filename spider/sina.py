@@ -5,6 +5,7 @@
 @author: alery
 @file: sina
 @time: 18-11-6 下午2:06
+@desc: 爬取新浪滚动新闻,没有ip限制,没有速度限制
 """
 import json
 import time
@@ -15,13 +16,12 @@ import pymongo
 import requests
 from pyquery import PyQuery as pq
 
-g_keyword = '2510'
+# 设置每一类爬取的最大数,会和新浪存在的新闻数量取一个min
 number = 105000
 count = 0
 
 MONGO_URL = 'mongodb://127.0.0.1:27017'
 MONGO_DB = 'sina'
-MONGO_COLLECTION = g_keyword
 
 client = pymongo.MongoClient(MONGO_URL, connect=False)
 db = client[MONGO_DB]
@@ -102,7 +102,7 @@ def main(keyword):
 
 
 if __name__ == '__main__':
-    tags = [str(i) for i in range(2515, 2516)]
+    tags = [str(i) for i in range(2510, 2519)]
     print(tags)
     for v in tags:
         main(v)

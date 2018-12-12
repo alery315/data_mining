@@ -10,6 +10,7 @@ import _pickle as pickle
 import os
 import time
 import numpy as np
+from data_mining.config import *
 
 #  分类映射字典与反转字典
 from sklearn import metrics
@@ -58,7 +59,7 @@ def calc_condition_probability(vocabulary, tf_idf, label, cate_probability):
     vocabulary_reverse = dict(zip(vocabulary.values(), vocabulary.keys()))
 
     #  保存到文件中
-    with open('condition_probability.txt', 'w', encoding='utf-8') as f:
+    with open(condition_probability_path, 'w', encoding='utf-8') as f:
         for i in range(len(condition_probability)):
             for j in range(len(condition_probability[i])):
                 f.write(vocabulary_reverse[j] + ' ' + str(condition_probability[i][j]) + '\n')
@@ -68,7 +69,7 @@ def calc_condition_probability(vocabulary, tf_idf, label, cate_probability):
 # 读入p(xi|yi)矩阵
 def read_condition_probability(row, col):
     condition_probability = np.zeros([row, col])
-    with open('condition_probability.txt', 'r', encoding='utf-8') as f:
+    with open(condition_probability_path, 'r', encoding='utf-8') as f:
         content = f.readlines()
         num = 0
         for line in content:
@@ -153,17 +154,15 @@ def metrics_result(actual, predicted):
 
 
 def main():
+    # 设置混淆矩阵不用科学计数法输出
     np.set_printoptions(suppress=True)
     start = time.time()
-    base_path = '/home/alery/process/'
 
     # 导入训练集
-    train_path = base_path + "train_word_bag/tfidf_space.dat"
-    train_set = read_bunch_obj(train_path)
+    train_set = read_bunch_obj(train_space_path)
 
     # 导入测试集
-    test_path = base_path + "test_word_bag/test_space.dat"
-    test_set = read_bunch_obj(test_path)
+    test_set = read_bunch_obj(test_space_path)
 
     print('train词向量矩阵shape:  文档数: ', train_set.tdm.shape[0], '词向量维度: ', train_set.tdm.shape[1])
     print('test词向量矩阵shape: ', '文档数: ', test_set.tdm.shape[0], '词向量维度: ', test_set.tdm.shape[1])
@@ -174,19 +173,18 @@ def main():
 
     #  训练贝叶斯
     cate_probability = calc_cate_probability(label)
-    #  其实这里不该这么写!
-    if os.path.exists('condition_probability.txt'):
-        condition_probability = read_condition_probability(len(cate_probability), len(vocabulary))
-    else:
-        condition_probability = calc_condition_probability(vocabulary, tf_idf, label, cate_probability)
+    # # 读入条件概率
+    # condition_probability = read_condition_probability(len(cate_probability), len(vocabulary))
+    condition_probability = calc_condition_probability(vocabulary, tf_idf, label, cate_probability)
 
     end = time.time()
     print('计算矩阵cost {0:.2f} s'.format(end - start))
 
     #  测试集分类
     start = time.time()
-    test_path = base_path + 'test_corpus_seg/'
-    predicted, M = test(test_path, len(cate_probability), vocabulary, cate_probability, condition_probability)
+
+    # 返回预测标签集合与混淆矩阵
+    predicted, M = test(test_corpus_seg_path, len(cate_probability), vocabulary, cate_probability, condition_probability)
     # metrics_result(test_set.label, predicted)
     calc_acc(M)
 

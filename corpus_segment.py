@@ -6,7 +6,6 @@
 @file: corpus_segment
 @time: 18-11-24 下午8:13
 """
-import math
 import os
 import time
 from functools import partial
@@ -205,23 +204,23 @@ def main():
     start_time = time.time()
 
     # # 对训练集进行分词
-    # corpus_segment(train_corpus_path, train_seg_path)
+    # corpus_segment(train_corpus_path, train_corpus_seg_path)
     #
     # # 对测试集进行分词
-    # corpus_segment(test_corpus_path, test_seg_path)
+    # corpus_segment(test_corpus_path, test_corpus_seg_path)
     #
     # # 选择训练集与测试集
-    # split_train_test(train_path, test_path, REMAINING)
+    # split_train_test(train_corpus_seg_path, test_corpus_seg_path, REMAINING)
     # # 不加参数表示对半分
-    # split_train_test(train_path, test_path)
-
-    # 切分为多个文件
-    split_more_files(train_path)
-    split_more_files(test_path)
+    # split_train_test(train_corpus_seg_path, test_corpus_seg_path)
+    #
+    # # 切分为多个文件
+    # split_more_files(train_corpus_seg_path)
+    # split_more_files(test_corpus_seg_path)
 
     # # 保留部分文件
-    # reserve_files(train_path)
-    # reserve_files(test_path)
+    reserve_files(train_corpus_seg_path)
+    reserve_files(test_corpus_seg_path)
 
     end_time = time.time()
     print('分词耗时：{}秒'.format(int(end_time - start_time)))

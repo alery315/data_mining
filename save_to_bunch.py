@@ -64,9 +64,10 @@ def corpus_to_bunch(word_bag_path, seg_path):
 
 def main():
     start_time = time.time()
-    corpus_to_bunch(train_word_bag_path, train_seg_path)
 
-    corpus_to_bunch(test_word_bag_path, test_seg_path)
+    corpus_to_bunch(train_bunch_path, train_corpus_seg_path)
+    corpus_to_bunch(test_bunch_path, test_corpus_seg_path)
+
     end_time = time.time()
     print('保存到bunch耗时：{}秒'.format(int(end_time - start_time)))
 

@@ -5,6 +5,7 @@
 @author: alery
 @file: test
 @time: 18-11-6 下午4:00
+@desc: 爬取头条新闻分类,但是容易被封ip,需要加大sleep参数,其中有个加密的参数,需要单独用decode.js解密(别人写的). 这个爬虫容易被封,爬到的数据不多
 """
 from multiprocessing.pool import Pool
 
@@ -18,23 +19,26 @@ import hashlib
 import execjs
 import time
 import pandas as pd
-from data_mining.new import News
-
 
 requests.packages.urllib3.disable_warnings()  # 禁止提醒SSL警告
 
-
-BASE_URL = 'https://www.toutiao.com/'
+BASE_URL = 'http://www.toutiao.com/'
 KEYWORD = 'news_military'
-NUMBER = 12000
+NUMBER = 15000
+TIME_SLEEP = 0.1
 
 MONGO_URL = 'mongodb://127.0.0.1:27017'
 MONGO_DB = 'toutiao'
 MONGO_COLLECTION = KEYWORD
 
-client = pymongo.MongoClient(MONGO_URL)
+client = pymongo.MongoClient(MONGO_URL, connect=False)
 db = client[MONGO_DB]
 collection = db[MONGO_COLLECTION]
+headers = {'Accept': '*/*',
+           'Accept-Language': 'zh-CN',
+           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; InfoPath.3; rv:11.0) like Gecko',
+           'Connection': 'Keep-Alive',
+           }
 
 
 class Toutiao(object):
@@ -42,12 +46,6 @@ class Toutiao(object):
     def __init__(self, keyword):
         self.url = BASE_URL + 'ch/' + keyword
         self.s = requests.session()
-        headers = {'Accept': '*/*',
-                   'Accept-Language': 'zh-CN',
-                   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; InfoPath.3; rv:11.0) like Gecko',
-                   'Connection': 'Keep-Alive',
-
-                   }
         self.s.headers.update(headers)
         self.keyword = keyword
 
@@ -67,64 +65,81 @@ class Toutiao(object):
         ecp = '5B7674A7FF2E9E1'
         self.s.headers.update(headers)
 
-        for i in range(0, NUMBER):  ##获取页数
+        for i in range(0, NUMBER):  # 获取页数
+            try:
+                Honey = json.loads(self.get_js())
+                eas = Honey['as']
+                ecp = Honey['cp']
+                signature = Honey['_signature']
+                url = 'http://www.toutiao.com/api/pc/feed/?category={}&utm_source=toutiao&widen=1&max_behot_time={}&max_behot_time_tmp={}&tadrequire=true&as={}&cp={}&_signature={}'.format(
+                    self.keyword, max_behot_time, max_behot_time, eas, ecp, signature)
+                req = self.s.get(url=url, verify=False)
+                # print(req.text)
+                # print(url)
+                j = json.loads(req.text)
+                # max_behot_time = j['next']['max_behot_time']
+                pool = Pool()
+                pool.map(self.get_news, [v for v in j['data']])
+                pool.close()
+                pool.join()
+                print('------------' + str(j['next']['max_behot_time']))
+            except BaseException as e:
+                print("error in get_data: " + e.__str__())
 
-            Honey = json.loads(self.get_js())
-            eas = Honey['as']
-            ecp = Honey['cp']
-            signature = Honey['_signature']
-            url = 'https://www.toutiao.com/api/pc/feed/?category={}&utm_source=toutiao&widen=1&max_behot_time={}&max_behot_time_tmp={}&tadrequire=true&as={}&cp={}&_signature={}'.format(
-                self.keyword, max_behot_time, max_behot_time, eas, ecp, signature)
-            req = self.s.get(url=url, verify=False)
-            print(req.text)
-            print(url)
-            j = json.loads(req.text)
-            # max_behot_time = j['next']['max_behot_time']
-            for k in range(0, len(j['data'])):
-                # article_genre: "gallery" 这个是图片集没有文字
-                # tag: "ad" 这个是广告
+    def get_news(self, j):
+        # article_genre: "gallery" 这个是图片集没有文字
+        # tag: "ad" 这个是广告
+        try:
+            if j['tag'] != 'ad' and j['article_genre'] != 'gallery' \
+                    and j['tag'] != 'forum_post':
+                title = j['title']  # 标题
+                source_url = BASE_URL + j['source_url']  # 文章链接
+                tag = j['tag']  # 频道名
                 try:
-                    if j['data'][k]['tag'] != 'ad' and j['data'][k]['article_genre'] != 'gallery' \
-                            and j['data'][k]['tag'] != 'forum_post':
-                        title = (j['data'][k]['title'])  # 标题
-                        source_url = ('https://www.toutiao.com/' + j['data'][k]['source_url'])  # 文章链接
-                        tag = (j['data'][k]['tag'])  # 频道名
-                        # try:
-                        #     chinese_tag = (j['data'][k]['chinese_tag'])  # 频道中文名
-                        # except:
-                        #     chinese_tag = ''
-                        try:
-                            if j['data'][k]['label']:
-                                label = (j['data'][k]['label'])  # 标签
-                        except:
-                            label = []
-                        behot = int(j['data'][k]['behot_time'])
-                        behot_time = (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(behot)))  # 发布时间
-                        data = {'title': title, 'url': source_url,
-                                'tag': tag,
-                                'label': label,
-                                'time': behot_time,
-                                }
+                    chinese_tag = (j['chinese_tag'])  # 频道中文名
+                except:
+                    chinese_tag = ''
+                try:
+                    if j['label']:
+                        label = [j['label']]  # 标签
+                except:
+                    label = []
+                behot = int(j['behot_time'])
+                behot_time = (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(behot)))  # 发布时间
+                data = {'title': title, 'url': source_url,
+                        'tag': tag,
+                        'chinese_tag': chinese_tag, 'label': label,
+                        'time': behot_time,
+                        }
 
-                        data['content'] = self.get_content(data['url'])
-                        collection.insert(data)
-                except BaseException as e:
-                    # print(data['url'])
-                    print("error : " + e.__str__())
-            time.sleep(0.2)
-            print('------------' + str(j['next']['max_behot_time']))
-            # 保存到csv
-            # df = pd.DataFrame(data=data)
-            # df.to_csv(r'toutiao.csv', encoding='UTF-8', index=0)
+                # 获取网页内容
+                data['content'] = self.get_content(data['url'])
+
+                # 保存到mongodb
+                collection.insert(data)
+                time.sleep(TIME_SLEEP)
+
+                # 保存到csv
+                self.save_url_to_csv(data)
+
+        except BaseException as e:
+            # print(data['url'])
+            print("error in get_news: " + e.__str__())
+        # time.sleep(0.5)
+
+    # 保存url到csv
+    def save_url_to_csv(self, data):
+        df = pd.DataFrame(data=data)
+        df.to_csv(r'toutiao.csv', mode='a', encoding='UTF-8', header=False, index=False)
 
     # 获取新闻内容
     def get_content(self, url):
-        resp = self.s.get(url, verify=False)
+        resp = requests.get(url, headers=headers, verify=False)
         html = pq(resp.content.decode('utf-8'))
+        # print(html.html())
         content = re.search("content: '(.*?)',", html.html(), re.S).group(1)
-        content = content.replace('lt;', '<').replace('gt;', '>').replace('&amp;', '').replace('&quot;', '"')
+        content = content.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"')
         html = pq(content).text()
-        time.sleep(0.1)
         # print(html)
         return html
 

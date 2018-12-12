@@ -36,10 +36,10 @@ def main():
     # 导入测试集
     test_set = read_bunch_obj(test_space_path)
 
-    print('train词向量矩阵shape: ', train_set.tdm.shape)
-    print('test词向量矩阵shape: ', test_set.tdm.shape)
+    print('train词向量矩阵shape:  文档数: ', train_set.tdm.shape[0], '词向量维度: ', train_set.tdm.shape[1])
+    print('test词向量矩阵shape: ', '文档数: ', test_set.tdm.shape[0], '词向量维度: ', test_set.tdm.shape[1])
 
-    print(len(train_set.vocabulary))
+    # print(len(train_set.vocabulary))
     # print(train_set.vocabulary.items())
 
     # l = list(train_set.vocabulary.items())
@@ -77,7 +77,7 @@ def main():
     metrics_result(test_set.label, predicted)
 
     end_time = time.time()
-    print('分词耗时：{}秒'.format(int(end_time - start_time)))
+    print('贝叶斯分类耗时：{}秒'.format(int(end_time - start_time)))
 
 
 if __name__ == '__main__':
