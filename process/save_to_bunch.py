@@ -9,12 +9,11 @@
 import os
 import _pickle as pickle
 import time
-from multiprocessing.pool import Pool
 from data_mining.config import *
 import threadpool
 from sklearn.datasets.base import Bunch
 
-from data_mining.corpus_segment import THREAD_NUM
+from data_mining.process.corpus_segment import THREAD_NUM
 
 
 def read_file(path):
