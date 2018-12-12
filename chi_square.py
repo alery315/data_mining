@@ -12,6 +12,7 @@ import time
 from data_mining.config import *
 
 sum_dict = {}
+# 每一类保留前N个特征词
 RESERVED_NUM = 10000
 
 
@@ -132,12 +133,13 @@ def process_corpus_file(path):
 def main():
     start_time = time.time()
 
-    # os.system('rm -rf /home/alery/process/test_corpus_seg_chi')
-    # os.system('rm -rf /home/alery/process/train_corpus_seg_chi')
-    # os.system('cp -r /home/alery/process/test_corpus_seg /home/alery/process/test_corpus_seg_chi')
-    # os.system('cp -r /home/alery/process/train_corpus_seg /home/alery/process/train_corpus_seg_chi')
-    #
-    # os.system('rm -rf /home/alery/process/chi_square/*')
+    # 这里我把分好的词复制了一份,用来做卡方,原来的直接用tf_idf分类
+    os.system('rm -rf {}'.format(test_corpus_chi_path))
+    os.system('rm -rf {}'.format(train_corpus_chi_path))
+    os.system('cp -r {0} {1}'.format(test_corpus_seg_path, test_corpus_chi_path))
+    os.system('cp -r {0} {1}'.format(train_corpus_seg_path, train_corpus_seg_path))
+
+    os.system('rm -rf {}*'.format(chi_path))
 
     print('文件处理完成!')
 

@@ -29,8 +29,8 @@ test_corpus_path = base_path + 'test_corpus/'
 # train_corpus_seg_path = base_path + 'train_corpus_seg/'
 # test_corpus_seg_path = base_path + 'test_corpus_seg/'
 # 这里存放的是卡方提取后的
-train_corpus_seg_path = base_path + 'train_corpus_seg_chi/'
-test_corpus_seg_path = base_path + 'test_corpus_seg_chi/'
+train_corpus_seg_path = base_path + 'train_corpus_seg/'
+test_corpus_seg_path = base_path + 'test_corpus_seg/'
 
 # 停用词存放 这个我在项目里了,相对路径
 stop_word_path = base_path + 'stop_words.txt'
