@@ -29,7 +29,8 @@ db = client[MONGO_DB]
 
 headers = {'Accept': '*/*',
            'Accept-Language': 'zh-CN',
-           'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
+           'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.3' 
+                         '6 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
            'Connection': 'Keep-Alive',
            'Referer': 'https://news.sina.com.cn/roll/',
            }
@@ -37,9 +38,10 @@ headers = {'Accept': '*/*',
 
 def get_url(page, keyword):
     try:
+        base_url = 'https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid={0}&k=&num=50&page={1}'
         collection = db[keyword]
         print("当前分类为{0},爬取页数为{1}页".format(keyword, page))
-        url = 'https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid={0}&k=&num=50&page={1}'.format(keyword, page)
+        url = base_url.format(keyword, page)
         resp = requests.get(url).content.decode('utf-8')
 
         j = json.loads(resp, encoding='utf-8')
@@ -69,6 +71,7 @@ def get_page(data, url, collection):
         doc = pq(resp)
         content = doc('.article').text()
         # print(url)
+        # 如果上面的没有解析出来内容,说明是另一种网页布局,爬到比较老的页面会遇,采用下面的解析
         if not content:
             content = doc('#artibody').text()
         content = content.replace('\n', '')

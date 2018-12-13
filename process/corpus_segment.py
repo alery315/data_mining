@@ -155,6 +155,7 @@ def split_train_test(train_path_, test_path_, remaining=-1):
             dir_path = os.path.join(train_path_, my_dir)
             files = os.listdir(dir_path)
             files.sort(key=lambda name: int(name.split('_')[-1].split('.')[0]))
+            # random.shuffle(files)
             # print(files)
             length = len(files)
             num = int(length / 2)
@@ -168,6 +169,7 @@ def split_train_test(train_path_, test_path_, remaining=-1):
             dir_path = os.path.join(test_path_, my_dir)
             files = os.listdir(dir_path)
             files.sort(key=lambda name: int(name.split('_')[-1].split('.')[0]))
+            # random.shuffle(files)
             length = len(files)
             num = int(length / 2)
             if my_dir not in cate_num_dict:

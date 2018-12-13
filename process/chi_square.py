@@ -26,12 +26,12 @@ def read_file(path, sep):
         return f.read().split(sep)
 
 
-def read_chi_square(path):
+def read_chi_square(path, reserved=RESERVED_NUM):
     with open(path, 'r', encoding='utf-8') as f:
         count = 1
         d = {}
         for line in f:
-            if count == RESERVED_NUM:
+            if count == reserved:
                 return d
             count += 1
             d[line] = 1
@@ -107,7 +107,7 @@ def calc_chi_square():
                     (word_in_cate + word_out_cate) * (no_word_in_cate + no_word_out_cate))
         sorted_list = sorted(chi_dict.items(), key=lambda d1: d1[1], reverse=True)
         for item in sorted_list:
-            write_file('/home/alery/process/chi_square/{}_chi.txt'.format(cate), item[0])
+            write_file('{0}{1}_chi.txt'.format(chi_path, cate), item[0])
         print(cate, '卡方值写入完成!')
 
 
@@ -115,7 +115,7 @@ def process_corpus_file(path):
     dirs = os.listdir(path)
     for my_dir in dirs:
         dir_path = os.path.join(path, my_dir)
-        d = read_chi_square('/home/alery/process/chi_square/{}_chi.txt'.format(my_dir))
+        d = read_chi_square('{0}{1}_chi.txt'.format(chi_path, my_dir))
         # print(d)
         files = os.listdir(dir_path)
         for file in files:
@@ -128,6 +128,13 @@ def process_corpus_file(path):
                 for seg in seg_list:
                     f.write(seg + ' ')
         print(my_dir, '分词处理完成!')
+
+
+def print_some_features(reserved):
+    dirs = os.listdir(train_corpus_seg_path)
+    for my_dir in dirs:
+        d = read_chi_square('{0}{1}_chi.txt'.format(chi_path, my_dir), reserved)
+        print(my_dir, [k.strip() for k in d])
 
 
 def main():
@@ -158,6 +165,9 @@ def main():
     # 处理原有分词文件
     process_corpus_file(train_corpus_chi_path)
     process_corpus_file(test_corpus_chi_path)
+
+    # 打印前10位特征词
+    print_some_features(10)
 
     end_time = time.time()
     print('卡方计算与特征提取耗时：{}秒'.format(int(end_time - start_time)))

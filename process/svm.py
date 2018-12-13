@@ -41,25 +41,27 @@ def main():
     print('test词向量矩阵shape: ', test_set.tdm.shape)
 
     # svm = SVC(C=1.0, kernel='linear')
+    # svm = SVC(C=10, kernel='rbf', gamma=1)
     # model = svm.fit(train_set.tdm, train_set.label)
     # print(model)
     # predicted = svm.predict(test_set.tdm)
-
-    # svc_cl = SVC(gamma='auto')
-    # pipe = make_pipeline(train_set.vec, svc_cl)
-    # pipe.fit(train_set.tdm, train_set.label)
-    # predicted = pipe.predict(test_set.tdm)
+    # with open('results.txt', 'w', encoding='utf-8') as f:
+    #     for i in range(len(predicted)):
+    #         f.write(test_set.label[i] + " " + predicted[i] + '\n')
     # metrics_result(test_set.label, predicted)
 
+    # svm网格搜索最佳参数
     svm = SVC()
 
     para_range = [0.0001, 0.001, 0.01, 0.1, 1.0, 10, 100, 1000, 10000]
     para_grid = [
-        {'C': para_range,
-         'kernel': ['linear']},
-        {'C': para_range,
-         'gamma': para_range,
-         'kernel': ['rbf']}
+        {
+            'C': para_range,
+            'kernel': ['linear']},
+        {
+            'C': para_range,
+            'gamma': para_range,
+            'kernel': ['rbf']}
     ]
 
     grid_search = GridSearchCV(svm, para_grid, cv=10, n_jobs=-1, verbose=1)
@@ -68,6 +70,8 @@ def main():
     print(list(grid_search.best_estimator_.get_params().items()))
 
     predicted = grid_search.best_estimator_.predict(test_set.tdm)
+
+    print(grid_search.best_estimator_)
 
     metrics_result(test_set.label, predicted)
 
