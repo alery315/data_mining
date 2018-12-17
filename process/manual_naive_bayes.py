@@ -123,9 +123,9 @@ def test(path, dim, vocabulary, cate_probability, condition_probability):
 
 #  计算分类精度
 def calc_acc(M):
-    print('-' * 22, '分类混淆矩阵为:', '-' * 23)
+    print('-' * 30, '分类混淆矩阵为:', '-' * 30)
     print(M)
-    print('-' * 60)
+    print('-' * 75)
     n = len(M)
     acc_all = 0
     recall_all = 0

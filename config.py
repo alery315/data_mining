@@ -53,3 +53,6 @@ test_space_path = base_path + 'test_word_bag/test_space.dat'
 
 # svm 条件概率矩阵
 condition_probability_path = base_path + 'train_word_bag/condition_probability.txt'
+
+# svm 结果文件
+svm_results = base_path + 'results.txt'

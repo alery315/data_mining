@@ -9,9 +9,15 @@
 import _pickle as pickle
 import time
 
+import numpy as np
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import metrics
 from data_mining.config import *
+from data_mining.process.manual_naive_bayes import *
+
+label_dict = {'car': 0, 'food': 1, 'game': 2,
+              'health': 3, 'history': 4, 'home': 5,
+              'military': 6, 'sports': 7, 'tech': 8, 'yule': 9}
 
 
 def read_bunch_obj(file):
@@ -28,6 +34,8 @@ def metrics_result(actual, predict):
 
 
 def main():
+    np.set_printoptions(suppress=True)
+
     start_time = time.time()
 
     # 导入训练集
@@ -39,6 +47,7 @@ def main():
     print('train词向量矩阵shape:  文档数: ', train_set.tdm.shape[0], '词向量维度: ', train_set.tdm.shape[1])
     print('test词向量矩阵shape: ', '文档数: ', test_set.tdm.shape[0], '词向量维度: ', test_set.tdm.shape[1])
 
+    # 输出词与对应的tf_idf值
     # print(len(train_set.vocabulary))
     # print(train_set.vocabulary.items())
 
@@ -56,25 +65,30 @@ def main():
     # # 预测分类结果
     predicted = clf.predict(test_set.tdm)
 
-    error_num = {}
+    # error_num = {}
+
+    M = np.zeros([10, 10])
 
     for label, file_name, expect_cate in zip(test_set.label, test_set.filenames, predicted):
-        if label != expect_cate:
-            if label not in error_num:
-                error_num[label] = {}
-                error_num[label][expect_cate] = 1
-            else:
-                if expect_cate not in error_num[label]:
-                    error_num[label][expect_cate] = 1
-                else:
-                    error_num[label][expect_cate] += 1
+        M[label_dict[label]][label_dict[expect_cate]] += 1
+        # if label != expect_cate:
+        #     if label not in error_num:
+        #         error_num[label] = {}
+        #         error_num[label][expect_cate] = 1
+        #     else:
+        #         if expect_cate not in error_num[label]:
+        #             error_num[label][expect_cate] = 1
+        #         else:
+        #             error_num[label][expect_cate] += 1
+        # print(file_name, ": 实际类别:", label, " -->预测类别:", expect_cate)
 
-            # print(file_name, ": 实际类别:", label, " -->预测类别:", expect_cate)
+    calc_acc(M)
 
-    print('-' * 60, "错误的数量为", '-' * 60)
-    for k, v in error_num.items():
-        print(k, v, sum([num for num in v.values()]))
-    metrics_result(test_set.label, predicted)
+    # print('-' * 60, "错误的数量为", '-' * 60)
+    # for k, v in error_num.items():
+    #     print(k, v, sum([num for num in v.values()]))
+
+    # metrics_result(test_set.label, predicted)
 
     end_time = time.time()
     print('贝叶斯分类耗时：{}秒'.format(int(end_time - start_time)))

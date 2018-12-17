@@ -45,16 +45,18 @@ def tf_idf(stop_word_file, bunch_path, space_path, train_tfidf_path=None):
     sublinear_tf 计算tf采用亚线性策略,以前是词频,现在用1+log(tf)来当词频
     max_df 文档频率过高,作为临时停用词
     min_df 文档频率太低,增加了维度,可以适当控制
+    max_features 最大词向量维度
     '''
     if train_tfidf_path is not None:
         trainbunch = read_bunch_obj(train_tfidf_path)
         tfidf_space.vocabulary = trainbunch.vocabulary
         vectorizer = TfidfVectorizer(stop_words=stop_word_list, sublinear_tf=True, max_df=0.35, min_df=0.0005,
-                                     vocabulary=trainbunch.vocabulary)
+                                     max_features=12000, vocabulary=trainbunch.vocabulary)
         tfidf_space.vec = vectorizer
         tfidf_space.tdm = vectorizer.fit_transform(bunch.contents)
     else:
-        vectorizer = TfidfVectorizer(stop_words=stop_word_list, sublinear_tf=True, max_df=0.35, min_df=0.0005)
+        vectorizer = TfidfVectorizer(stop_words=stop_word_list, sublinear_tf=True, max_df=0.35, min_df=0.0005
+                                     , max_features=12000)
         tfidf_space.vec = vectorizer
         tfidf_space.tdm = vectorizer.fit_transform(bunch.contents)
         tfidf_space.vocabulary = vectorizer.vocabulary_
