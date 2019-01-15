@@ -11,8 +11,6 @@ import time
 
 import numpy as np
 from sklearn.naive_bayes import MultinomialNB
-from sklearn import metrics
-from data_mining.config import *
 from data_mining.process.manual_naive_bayes import *
 
 label_dict = {'car': 0, 'food': 1, 'game': 2,
@@ -27,10 +25,10 @@ def read_bunch_obj(file):
 
 
 # 计算分类精度：
-def metrics_result(actual, predict):
-    print('正确率:{0:.3f}'.format(metrics.precision_score(actual, predict, average='weighted')))
-    print('召回率:{0:0.3f}'.format(metrics.recall_score(actual, predict, average='weighted')))
-    print('f1-score:{0:.3f}'.format(metrics.f1_score(actual, predict, average='weighted')))
+def metrics_result(actual, predicted):
+    print('正确率:{0:.3f}'.format(metrics.precision_score(actual, predicted, average='weighted')))
+    print('召回率:{0:0.3f}'.format(metrics.recall_score(actual, predicted, average='weighted')))
+    print('f1-score:{0:.3f}'.format(metrics.f1_score(actual, predicted, average='weighted')))
 
 
 def main():
@@ -67,28 +65,19 @@ def main():
 
     # error_num = {}
 
-    M = np.zeros([10, 10])
+    # 保存到文件
+    with open(nb_results, 'w', encoding='utf-8') as f:
+        for i in range(len(predicted)):
+            f.write(test_set.label[i] + " " + predicted[i] + '\n')
+
+    metrics_result(test_set.label, predicted)
+
+    confusion_matrix = np.zeros([10, 10])
 
     for label, file_name, expect_cate in zip(test_set.label, test_set.filenames, predicted):
-        M[label_dict[label]][label_dict[expect_cate]] += 1
-        # if label != expect_cate:
-        #     if label not in error_num:
-        #         error_num[label] = {}
-        #         error_num[label][expect_cate] = 1
-        #     else:
-        #         if expect_cate not in error_num[label]:
-        #             error_num[label][expect_cate] = 1
-        #         else:
-        #             error_num[label][expect_cate] += 1
-        # print(file_name, ": 实际类别:", label, " -->预测类别:", expect_cate)
+        confusion_matrix[label_dict[label]][label_dict[expect_cate]] += 1
 
-    calc_acc(M)
-
-    # print('-' * 60, "错误的数量为", '-' * 60)
-    # for k, v in error_num.items():
-    #     print(k, v, sum([num for num in v.values()]))
-
-    # metrics_result(test_set.label, predicted)
+    calc_acc(confusion_matrix)
 
     end_time = time.time()
     print('贝叶斯分类耗时：{}秒'.format(int(end_time - start_time)))

@@ -13,8 +13,6 @@ from data_mining.config import *
 import threadpool
 from sklearn.datasets.base import Bunch
 
-from data_mining.process.corpus_segment import THREAD_NUM
-
 
 def read_file(path):
     with open(path, 'r', encoding='utf-8') as f:
@@ -45,7 +43,7 @@ def corpus_to_bunch(word_bag_path, seg_path):
 
         # 多线程
         pool = threadpool.ThreadPool(THREAD_NUM)
-        requests = threadpool.makeRequests(to_bunch, [class_path + file for file in file_list])
+        requests = threadpool.makeRequests(to_bunch, [class_path + file for file in file_list][:TEST_NUM])
         [pool.putRequest(req) for req in requests]
         pool.wait()
 

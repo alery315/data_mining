@@ -10,7 +10,12 @@ import pickle
 import time
 
 from sklearn.model_selection import GridSearchCV
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.svm import SVC,LinearSVC
+import multiprocessing
 from sklearn.svm import SVC
+from sklearn.utils import Bunch
+
 from data_mining.process.manual_naive_bayes import *
 
 
@@ -43,27 +48,56 @@ def main():
 
     start = time.time()
 
-    # # 导入训练集
-    # train_set = read_bunch_obj(train_space_path)
+    """
+    space_bunch:
+    tdm matrix,词向量矩阵
+    label list,每篇文档对应的标签
+    """
+    # 导入训练集
+    train_set = read_bunch_obj(train_space_path)
+
+    # 导入测试集
+    test_set = read_bunch_obj(test_space_path)
+
+    print('train词向量矩阵shape: ', train_set.tdm.shape)
+    print('test词向量矩阵shape: ', test_set.tdm.shape)
+
+    # # 多进程的线性svm
+    # # onevsrestclassifier 处理多分类,将其他类看做反例
+    # # linearSVC线性svm,采用cpu核数的进程数
+    # linear_svm = OneVsRestClassifier(LinearSVC(class_weight='balanced'), n_jobs=multiprocessing.cpu_count())
+    # model = linear_svm.fit(train_set.tdm, train_set.label)
     #
-    # # 导入测试集
-    # test_set = read_bunch_obj(test_space_path)
-    #
-    # print('train词向量矩阵shape: ', train_set.tdm.shape)
-    # print('test词向量矩阵shape: ', test_set.tdm.shape)
-    #
+    # svm_model = Bunch(model=None)
+    # svm_model.model = model
+    # with open(svm_model_path, 'wb') as f:
+    #     pickle.dump(svm_model, f)
+
+    # 读入模型
+    svm_model = read_bunch_obj(svm_model_path).model
+    print(svm_model)
+
+    predicted = svm_model.predict(test_set.tdm)
+
+    confusion_matrix = np.zeros([CLASS_NUMBER, CLASS_NUMBER])
+    for i in range(len(predicted)):
+        confusion_matrix[label_dict[test_set.label[i]], label_dict[predicted[i]]] += 1
+    calc_acc(confusion_matrix)
+
+    # 单进程的svm
     # svm = SVC(C=1.0, kernel='linear')
     # # svm = SVC(C=10, kernel='rbf', gamma=1)
     # model = svm.fit(train_set.tdm, train_set.label)
     # print(model)
+
     # predicted = svm.predict(test_set.tdm)
-    # with open('results.txt', 'w', encoding='utf-8') as f:
+    # with open(svm_results, 'w', encoding='utf-8') as f:
     #     for i in range(len(predicted)):
     #         f.write(test_set.label[i] + " " + predicted[i] + '\n')
-    # metrics_result(test_set.label, predicted)
-
-    M = read_result(svm_results)
-    calc_acc(M)
+    #
+    # # 读入结果
+    # M = read_result(svm_results)
+    # calc_acc(M)
 
     # svm网格搜索最佳参数
     # svm = SVC()

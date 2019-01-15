@@ -6,6 +6,10 @@
 @file: config
 @time: 18-12-11 下午9:28
 """
+
+# 分类数
+CLASS_NUMBER = 10
+
 # 每个文件取的最大值,我分的是每个文件5000条
 MAX_LINE = 50000
 # 线程数
@@ -17,6 +21,9 @@ REMAINING = 4
 # 留下一部分文件来测试
 RES_FILES = 1000
 
+# 测试数据在save_to_bunch那里
+TEST_NUM = 5000
+
 # 文件存放目录base
 base_path = '/home/alery/process/'
 
@@ -26,11 +33,11 @@ test_corpus_path = base_path + 'test_corpus/'
 
 # 分词后存放
 
-train_corpus_seg_path = base_path + 'train_corpus_seg/'
-test_corpus_seg_path = base_path + 'test_corpus_seg/'
+# train_corpus_seg_path = base_path + 'train_corpus_seg/'
+# test_corpus_seg_path = base_path + 'test_corpus_seg/'
 # 这里存放的是卡方提取后的
-# train_corpus_seg_path = base_path + 'train_corpus_seg_chi/'
-# test_corpus_seg_path = base_path + 'test_corpus_seg_chi/'
+train_corpus_seg_path = base_path + 'train_corpus_seg_chi/'
+test_corpus_seg_path = base_path + 'test_corpus_seg_chi/'
 
 # 停用词存放 这个我在项目里了,相对路径
 stop_word_path = base_path + 'stop_words.txt'
@@ -55,4 +62,10 @@ test_space_path = base_path + 'test_word_bag/test_space.dat'
 condition_probability_path = base_path + 'train_word_bag/condition_probability.txt'
 
 # svm 结果文件
-svm_results = base_path + 'results.txt'
+svm_results = base_path + 'svm_results.txt'
+
+# nb 结果文件
+nb_results = base_path + 'nb_results.txt'
+
+# svm模型
+svm_model_path = base_path + 'svm_model.dat'
